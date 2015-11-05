@@ -1,0 +1,5 @@
+---
+iperf_output_file: "/tmp/iperf.csv"
+iperf_runs_interval: 5
+iperf_tcp_window_size: 512k
+node_name_pattern: "alpha"

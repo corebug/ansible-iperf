@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for node in $(grep {{ node_name_pattern }} /etc/hosts | grep -v $HOSTNAME | awk '{print $2;}')
+do
+    iperf -c $node -w {{ iperf_tcp_window_size }} -y c >> {{ iperf_output_file }}
+done

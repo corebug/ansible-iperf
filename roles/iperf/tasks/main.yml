@@ -1,0 +1,54 @@
+---
+- name: install iperf
+  sudo: yes
+  yum:
+    name: iperf
+    state: present
+  tags:
+    - iperf
+
+- name: setup iperf systemd target
+  sudo: yes
+  template:
+    src: "iperf.service.j2"
+    dest: "/usr/lib/systemd/system/iperf.service"
+    force: yes
+  tags:
+    - iperf
+
+- name: reload systemd configuration
+  sudo: yes
+  command: systemctl daemon-reload
+  tags:
+    - iperf
+
+- name: start iperf service
+  sudo: yes
+  service:
+    name: iperf
+    state: restarted
+    enabled: true
+  tags:
+    - iperf
+
+- name: deploy iperf check script
+  sudo: yes
+  template:
+    src: "iperf_check.sh.j2"
+    dest: "/opt/iperf_check.sh"
+    force: yes
+    mode: "u=rwx,g=rx,o=rx"
+  tags:
+    - iperf
+
+- name: setup cron job for iperf checks
+  sudo: yes
+  cron:
+    name: "iperf_check"
+    minute: "*/{{ iperf_runs_interval }}"
+    cron_file: iperf_check
+    user: root
+    job: "sleep $((60 * (RANDOM % 3))); /opt/iperf_check.sh"
+    state: present
+  tags:
+    - iperf
